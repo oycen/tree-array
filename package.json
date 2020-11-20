@@ -1,0 +1,32 @@
+{
+  "name": "tree-array",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "src/index.ts",
+  "description": "A JavaScript tree array library, usage is similar to JavaScript Array built-in objects.",
+  "keywords": [
+    "tree array",
+    "tree",
+    "tree transform"
+  ],
+  "author": "oycen<oycen@sina.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oycen/tree-array.git"
+  },
+  "bugs": {
+    "url": "https://github.com/oycen/tree-array/issues"
+  },
+  "homepage": "https://github.com/oycen/tree-array",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -cw"
+  },
+  "devDependencies": {
+    "rollup": "^2.33.3",
+    "rollup-plugin-typescript2": "^0.29.0",
+    "typescript": "^4.0.5"
+  }
+}
