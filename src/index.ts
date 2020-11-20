@@ -189,7 +189,7 @@ export class Tree<T extends object> {
   }
 
   /**
-   * 树扁平化
+   * Tree flattening（树扁平化）
    */
   flat() {
     const result: T[] = [];
