@@ -27,14 +27,41 @@ var TreeArray = (function (exports) {
         return __assign.apply(this, arguments);
     };
 
+    /** Tree Class（树类）*/
     var Tree = /** @class */ (function () {
+        /**
+         * Tree class constructor（树构造函数）
+         * @param data Tree structure data or flat tree structure data（树形结构数据或扁平的树形结构数据）
+         * @param options Tree options（树选项配置）
+         */
         function Tree(data, options) {
-            this.data = data;
             this.options = __assign(__assign({}, Tree.defaultOptions), options);
+            this.data = (options === null || options === void 0 ? void 0 : options.parent) ? Tree.toTreeData(data, this.options) : data;
         }
-        Tree.prototype.hasChildren = function (item) {
-            return Array.isArray(item[this.options.children]);
+        /**
+         * Flat array conversion tree array（扁平数组转换树数组）
+         * @param list Flat array（扁平数组）
+         * @param options Tree options（树选项配置）
+         */
+        Tree.toTreeData = function (list, options) {
+            var id = options.id, parent = options.parent, children = options.children;
+            var result = list.reduce(function (map, item) { return ((map[item[id]] = item), (item[children] = []), map); }, {});
+            return list.filter(function (item) {
+                result[item[parent]] && result[item[parent]].children.push(item);
+                return !item[parent];
+            });
         };
+        /**
+         * Determine node has children（判断节点是否有子节点）
+         * @param node Node object（节点）
+         */
+        Tree.prototype.hasChildren = function (node) {
+            return Array.isArray(node[this.options.children]) && node[this.options.children].length > 0;
+        };
+        /**
+         * Tree node traversal（树节点遍历）
+         * @param callback Tree node callback function（节点回调函数）
+         */
         Tree.prototype.forEach = function (callback, path) {
             var _this = this;
             if (path === void 0) { path = { indexPath: [], itemPath: [] }; }
@@ -54,6 +81,10 @@ var TreeArray = (function (exports) {
                 }
             });
         };
+        /**
+         * Tree node mapping（树节点映射转换）
+         * @param callback Tree node callback function（节点回调函数）
+         */
         Tree.prototype.map = function (callback, path) {
             var _this = this;
             if (path === void 0) { path = { indexPath: [], itemPath: [] }; }
@@ -74,6 +105,10 @@ var TreeArray = (function (exports) {
                 }
             });
         };
+        /**
+         * Tree node filter（树节点过滤）
+         * @param callback Tree node callback function（节点回调函数）
+         */
         Tree.prototype.filter = function (callback, path) {
             var _this = this;
             if (path === void 0) { path = { indexPath: [], itemPath: [] }; }
@@ -94,6 +129,10 @@ var TreeArray = (function (exports) {
                 }
             });
         };
+        /**
+         * Find tree node（查找树节点）
+         * @param callback Tree node callback function（节点回调函数）
+         */
         Tree.prototype.find = function (callback) {
             var _this = this;
             var result;
@@ -113,6 +152,10 @@ var TreeArray = (function (exports) {
                 return result;
             }
         };
+        /**
+         * If there are tree nodes that meet the conditions, it returns true, otherwise it returns false（如有满足条件的树节点则返回true，反之则返回false）
+         * @param callback Tree node callback function（节点回调函数）
+         */
         Tree.prototype.some = function (callback) {
             var _this = this;
             var result = false;
@@ -132,6 +175,10 @@ var TreeArray = (function (exports) {
                 return result;
             }
         };
+        /**
+         * If all tree nodes meet the conditions, it returns true, otherwise it returns false（若所有树节点满足条件则返回true，反之则返回false）
+         * @param callback Tree node callback function（节点回调函数）
+         */
         Tree.prototype.every = function (callback) {
             var _this = this;
             var result = true;
@@ -151,21 +198,33 @@ var TreeArray = (function (exports) {
                 return result;
             }
         };
+        /**
+         * Tree flattening（树扁平化）
+         */
         Tree.prototype.flat = function () {
             var result = [];
             this.forEach(function (item) { return result.push(item); });
             return result;
         };
+        /**
+         * Tree data string representation（树数据字符串表示形式）
+         */
         Tree.prototype.toString = function () {
             return JSON.stringify(this.data);
         };
+        /** Tree default options（树默认选项配置） */
         Tree.defaultOptions = {
             id: 'id',
-            parent: 'parent',
+            parent: '',
             children: 'children',
         };
         return Tree;
     }());
+    /**
+     * Return a tree instance（返回一个树实例）
+     * @param data Tree structure data or flat tree structure data（树形结构数据或扁平的树形结构数据）
+     * @param options Tree options（树选项配置）
+     */
     function tree(data, options) {
         return new Tree(data, options);
     }
