@@ -20,9 +20,6 @@
     "url": "https://github.com/oycen/tree-array/issues"
   },
   "homepage": "https://github.com/oycen/tree-array",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -cw"
