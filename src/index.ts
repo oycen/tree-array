@@ -1,10 +1,10 @@
 /** Tree options interface（树选项配置）*/
 export interface TreeOptions {
-  /** Unique identification property name of the tree node（树节点的唯一标识属性名称） */
+  /** Unique identification property name of the tree node（节点的唯一标识属性名称） */
   id?: string;
-  /** Parent node property name of the tree node（树节点的父节点属性名称） */
+  /** Parent node property name of the tree node（节点的父节点属性名称） */
   parent?: string;
-  /** Children node property name of the tree node（树节点的子节点属性名称） */
+  /** Children node property name of the tree node（节点的子节点属性名称） */
   children?: string;
 }
 
@@ -21,12 +21,26 @@ export class Tree<T extends object> {
   /** Tree default options（树默认选项配置） */
   private static readonly defaultOptions: Required<TreeOptions> = {
     id: 'id',
-    parent: 'parent',
+    parent: '',
     children: 'children',
   };
 
   /** Tree options（树选项配置） */
   private options: Required<TreeOptions>;
+
+  /**
+   * Flat array conversion tree array（扁平数组转换树数组）
+   * @param list Flat array（扁平数组）
+   * @param options Tree options（树选项配置）
+   */
+  static toTreeData<T extends object>(list: T[], options: Required<TreeOptions>) {
+    const { id, parent, children } = options;
+    let result = list.reduce((map: any, item: any) => ((map[item[id]] = item), (item[children] = []), map), {});
+    return list.filter((item: any) => {
+      result[item[parent]] && result[item[parent]].children.push(item);
+      return !item[parent];
+    });
+  }
 
   /** Tree data（树数据） */
   data: T[];
@@ -37,8 +51,8 @@ export class Tree<T extends object> {
    * @param options Tree options（树选项配置）
    */
   constructor(data: T[], options?: TreeOptions) {
-    this.data = data;
     this.options = { ...Tree.defaultOptions, ...options };
+    this.data = options?.parent ? Tree.toTreeData(data, this.options) : data;
   }
 
   /**
