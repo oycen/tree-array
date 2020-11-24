@@ -24,40 +24,46 @@ var __assign = function() {
     return __assign.apply(this, arguments);
 };
 
-/** Tree Class（树类）*/
+/** Tree Class */
 var Tree = /** @class */ (function () {
     /**
-     * Tree class constructor（树构造函数）
-     * @param data Tree structure data or flat tree structure data（树形结构数据或扁平的树形结构数据）
-     * @param options Tree options（树选项配置）
+     * Tree class constructor
+     * @param data Tree structure data or flat tree structure data
+     * @param options Tree options
      */
     function Tree(data, options) {
         this.options = __assign(__assign({}, Tree.defaultOptions), options);
         this.data = (options === null || options === void 0 ? void 0 : options.parent) ? Tree.toTreeData(data, this.options) : data;
     }
     /**
-     * Flat array conversion tree array（扁平数组转换树数组）
-     * @param list Flat array（扁平数组）
-     * @param options Tree options（树选项配置）
+     * Flat array conversion tree array
+     * @param list Flat array
+     * @param options Tree options
      */
     Tree.toTreeData = function (list, options) {
         var id = options.id, parent = options.parent, children = options.children;
         var result = list.reduce(function (map, item) { return ((map[item[id]] = item), (item[children] = []), map); }, {});
         return list.filter(function (item) {
-            result[item[parent]] && result[item[parent]].children.push(item);
-            return !item[parent];
+            if (Object.prototype.toString.call(item[parent]) === '[object Object]') {
+                result[item[parent][id]] && result[item[parent][id]].children.push(item);
+                return !item[parent][id];
+            }
+            else {
+                result[item[parent]] && result[item[parent]].children.push(item);
+                return !item[parent];
+            }
         });
     };
     /**
-     * Determine node has children（判断节点是否有子节点）
-     * @param node Node object（节点）
+     * Determine node has children
+     * @param node Node object
      */
     Tree.prototype.hasChildren = function (node) {
         return Array.isArray(node[this.options.children]) && node[this.options.children].length > 0;
     };
     /**
-     * Tree node traversal（树节点遍历）
-     * @param callback Tree node callback function（节点回调函数）
+     * Tree node traversal
+     * @param callback Tree node callback function
      */
     Tree.prototype.forEach = function (callback, path) {
         var _this = this;
@@ -67,7 +73,8 @@ var Tree = /** @class */ (function () {
                 path.indexPath.push(index);
                 path.itemPath.push(item);
                 callback.call(_this, item, __assign({}, path), _this.data);
-                _this.hasChildren(item) && new Tree(item[_this.options.children], _this.options).forEach(callback, path);
+                _this.hasChildren(item) &&
+                    new Tree(item[_this.options.children], { id: _this.options.id, children: _this.options.children }).forEach(callback, path);
             }
             catch (error) {
                 throw error;
@@ -79,8 +86,8 @@ var Tree = /** @class */ (function () {
         });
     };
     /**
-     * Tree node mapping（树节点映射转换）
-     * @param callback Tree node callback function（节点回调函数）
+     * Tree node mapping
+     * @param callback Tree node callback function
      */
     Tree.prototype.map = function (callback, path) {
         var _this = this;
@@ -90,7 +97,10 @@ var Tree = /** @class */ (function () {
                 path.indexPath.push(index);
                 path.itemPath.push(item);
                 _this.hasChildren(item) &&
-                    (item[_this.options.children] = new Tree(item[_this.options.children], _this.options).map(callback, path));
+                    (item[_this.options.children] = new Tree(item[_this.options.children], {
+                        id: _this.options.id,
+                        children: _this.options.children,
+                    }).map(callback, path));
                 return callback.call(_this, item, __assign({}, path), _this.data);
             }
             catch (error) {
@@ -103,8 +113,8 @@ var Tree = /** @class */ (function () {
         });
     };
     /**
-     * Tree node filter（树节点过滤）
-     * @param callback Tree node callback function（节点回调函数）
+     * Tree node filter
+     * @param callback Tree node callback function
      */
     Tree.prototype.filter = function (callback, path) {
         var _this = this;
@@ -114,7 +124,10 @@ var Tree = /** @class */ (function () {
                 path.indexPath.push(index);
                 path.itemPath.push(item);
                 _this.hasChildren(item) &&
-                    (item[_this.options.children] = new Tree(item[_this.options.children], _this.options).filter(callback, path));
+                    (item[_this.options.children] = new Tree(item[_this.options.children], {
+                        id: _this.options.id,
+                        children: _this.options.children,
+                    }).filter(callback, path));
                 return callback.call(_this, item, __assign({}, path), _this.data);
             }
             catch (error) {
@@ -127,8 +140,8 @@ var Tree = /** @class */ (function () {
         });
     };
     /**
-     * Find tree node（查找树节点）
-     * @param callback Tree node callback function（节点回调函数）
+     * Find tree node
+     * @param callback Tree node callback function
      */
     Tree.prototype.find = function (callback) {
         var _this = this;
@@ -150,8 +163,8 @@ var Tree = /** @class */ (function () {
         }
     };
     /**
-     * If there are tree nodes that meet the conditions, it returns true, otherwise it returns false（如有满足条件的树节点则返回true，反之则返回false）
-     * @param callback Tree node callback function（节点回调函数）
+     * If there are tree nodes that meet the conditions, it returns true, otherwise it returns false
+     * @param callback Tree node callback function
      */
     Tree.prototype.some = function (callback) {
         var _this = this;
@@ -173,8 +186,8 @@ var Tree = /** @class */ (function () {
         }
     };
     /**
-     * If all tree nodes meet the conditions, it returns true, otherwise it returns false（若所有树节点满足条件则返回true，反之则返回false）
-     * @param callback Tree node callback function（节点回调函数）
+     * If all tree nodes meet the conditions, it returns true, otherwise it returns false
+     * @param callback Tree node callback function
      */
     Tree.prototype.every = function (callback) {
         var _this = this;
@@ -196,20 +209,31 @@ var Tree = /** @class */ (function () {
         }
     };
     /**
-     * Tree flattening（树扁平化）
+     * Tree flattening
      */
     Tree.prototype.flat = function () {
+        var _this = this;
         var result = [];
-        this.forEach(function (item) { return result.push(item); });
+        this.forEach(function (item, _a) {
+            var _b;
+            var itemPath = _a.itemPath;
+            var data = __assign({}, item);
+            delete data[_this.options.children];
+            data.parent = (_b = itemPath[itemPath.length - 2]) !== null && _b !== void 0 ? _b : null;
+            data.parent && delete data.parent[_this.options.children];
+            data.path = itemPath.map(function (item) { return item[_this.options.id]; });
+            data.level = itemPath.length;
+            result.push(data);
+        });
         return result;
     };
     /**
-     * Tree data string representation（树数据字符串表示形式）
+     * Tree data string representation
      */
     Tree.prototype.toString = function () {
         return JSON.stringify(this.data);
     };
-    /** Tree default options（树默认选项配置） */
+    /** Tree default options */
     Tree.defaultOptions = {
         id: 'id',
         parent: '',
@@ -218,14 +242,12 @@ var Tree = /** @class */ (function () {
     return Tree;
 }());
 /**
- * Return a tree instance（返回一个树实例）
- * @param data Tree structure data or flat tree structure data（树形结构数据或扁平的树形结构数据）
- * @param options Tree options（树选项配置）
+ * Return a tree instance
+ * @param data Tree structure data or flat tree structure data
+ * @param options Tree options
  */
 function tree(data, options) {
     return new Tree(data, options);
 }
 
 export default tree;
-export { Tree };
-//# sourceMappingURL=index.es.js.map
