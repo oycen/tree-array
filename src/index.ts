@@ -13,7 +13,7 @@ export interface NodePath<T> {
   /** Node index path */
   indexPath: number[];
   /** Node path */
-  itemPath: T[];
+  nodePath: T[];
 }
 
 /** Tree Class */
@@ -74,23 +74,23 @@ class Tree<T extends object> {
    */
   forEach(
     callback: (this: Tree<T>, node: T, path: NodePath<T>, tree: T[]) => void,
-    path: NodePath<T> = { indexPath: [], itemPath: [] }
+    path: NodePath<T> = { indexPath: [], nodePath: [] }
   ) {
     this.data.forEach((item: any, index) => {
       try {
         path.indexPath.push(index);
-        path.itemPath.push(item);
+        path.nodePath.push(item);
         callback.call(this, item, { ...path }, this.data);
         this.hasChildren(item) &&
-          new Tree<T>(item[this.options.children], { id: this.options.id, children: this.options.children }).forEach(
-            callback,
-            path
-          );
+          new Tree<T>(item[this.options.children], {
+            id: this.options.id,
+            children: this.options.children,
+          }).forEach(callback, path);
       } catch (error) {
         throw error;
       } finally {
         path.indexPath.pop();
-        path.itemPath.pop();
+        path.nodePath.pop();
       }
     });
   }
@@ -101,12 +101,12 @@ class Tree<T extends object> {
    */
   map<U>(
     callback: (this: Tree<T>, node: T, path: NodePath<T>, tree: T[]) => U,
-    path: NodePath<T> = { indexPath: [], itemPath: [] }
+    path: NodePath<T> = { indexPath: [], nodePath: [] }
   ) {
     return this.data.map((item: any, index) => {
       try {
         path.indexPath.push(index);
-        path.itemPath.push(item);
+        path.nodePath.push(item);
         this.hasChildren(item) &&
           (item[this.options.children] = new Tree<T>(item[this.options.children], {
             id: this.options.id,
@@ -117,7 +117,7 @@ class Tree<T extends object> {
         throw error;
       } finally {
         path.indexPath.pop();
-        path.itemPath.pop();
+        path.nodePath.pop();
       }
     });
   }
@@ -128,12 +128,12 @@ class Tree<T extends object> {
    */
   filter(
     callback: (this: Tree<T>, node: T, path: NodePath<T>, tree: T[]) => unknown,
-    path: NodePath<T> = { indexPath: [], itemPath: [] }
+    path: NodePath<T> = { indexPath: [], nodePath: [] }
   ) {
     return this.data.filter((item: any, index) => {
       try {
         path.indexPath.push(index);
-        path.itemPath.push(item);
+        path.nodePath.push(item);
         this.hasChildren(item) &&
           (item[this.options.children] = new Tree<T>(item[this.options.children], {
             id: this.options.id,
@@ -144,7 +144,7 @@ class Tree<T extends object> {
         throw error;
       } finally {
         path.indexPath.pop();
-        path.itemPath.pop();
+        path.nodePath.pop();
       }
     });
   }
@@ -165,6 +165,28 @@ class Tree<T extends object> {
     } finally {
       return result;
     }
+  }
+
+  /**
+   * Tree flattening
+   */
+  flat() {
+    const result: T[] = [];
+    this.forEach((item: any, { nodePath }) => {
+      const data = { ...item };
+
+      delete data[this.options.children];
+
+      data.parent = nodePath[nodePath.length - 2] ?? null;
+      data.parent && delete data.parent[this.options.children];
+
+      data.path = nodePath.map((item: any) => item[this.options.id]);
+      data.level = nodePath.length;
+      data.hasChild = this.hasChildren(item);
+
+      result.push(data);
+    });
+    return result;
   }
 
   /**
@@ -201,27 +223,6 @@ class Tree<T extends object> {
     } finally {
       return result;
     }
-  }
-
-  /**
-   * Tree flattening
-   */
-  flat() {
-    const result: T[] = [];
-    this.forEach((item: any, { itemPath }) => {
-      const data = { ...item };
-
-      delete data[this.options.children];
-
-      data.parent = itemPath[itemPath.length - 2] ?? null;
-      data.parent && delete data.parent[this.options.children];
-
-      data.path = itemPath.map((item: any) => item[this.options.id]);
-      data.level = itemPath.length;
-
-      result.push(data);
-    });
-    return result;
   }
 
   /**

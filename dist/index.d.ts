@@ -12,7 +12,7 @@ export interface NodePath<T> {
     /** Node index path */
     indexPath: number[];
     /** Node path */
-    itemPath: T[];
+    nodePath: T[];
 }
 /** Tree Class */
 declare class Tree<T extends object> {
@@ -60,6 +60,10 @@ declare class Tree<T extends object> {
      */
     find(callback: (this: Tree<T>, node: T, path: NodePath<T>, tree: T[]) => unknown): T | undefined;
     /**
+     * Tree flattening
+     */
+    flat(): T[];
+    /**
      * If there are tree nodes that meet the conditions, it returns true, otherwise it returns false
      * @param callback Tree node callback function
      */
@@ -69,10 +73,6 @@ declare class Tree<T extends object> {
      * @param callback Tree node callback function
      */
     every(callback: (this: Tree<T>, node: T, path: NodePath<T>, tree: T[]) => unknown): Boolean;
-    /**
-     * Tree flattening
-     */
-    flat(): T[];
     /**
      * Tree data string representation
      */

@@ -70,21 +70,24 @@ var TreeArray = (function () {
          */
         Tree.prototype.forEach = function (callback, path) {
             var _this = this;
-            if (path === void 0) { path = { indexPath: [], itemPath: [] }; }
+            if (path === void 0) { path = { indexPath: [], nodePath: [] }; }
             this.data.forEach(function (item, index) {
                 try {
                     path.indexPath.push(index);
-                    path.itemPath.push(item);
+                    path.nodePath.push(item);
                     callback.call(_this, item, __assign({}, path), _this.data);
                     _this.hasChildren(item) &&
-                        new Tree(item[_this.options.children], { id: _this.options.id, children: _this.options.children }).forEach(callback, path);
+                        new Tree(item[_this.options.children], {
+                            id: _this.options.id,
+                            children: _this.options.children,
+                        }).forEach(callback, path);
                 }
                 catch (error) {
                     throw error;
                 }
                 finally {
                     path.indexPath.pop();
-                    path.itemPath.pop();
+                    path.nodePath.pop();
                 }
             });
         };
@@ -94,11 +97,11 @@ var TreeArray = (function () {
          */
         Tree.prototype.map = function (callback, path) {
             var _this = this;
-            if (path === void 0) { path = { indexPath: [], itemPath: [] }; }
+            if (path === void 0) { path = { indexPath: [], nodePath: [] }; }
             return this.data.map(function (item, index) {
                 try {
                     path.indexPath.push(index);
-                    path.itemPath.push(item);
+                    path.nodePath.push(item);
                     _this.hasChildren(item) &&
                         (item[_this.options.children] = new Tree(item[_this.options.children], {
                             id: _this.options.id,
@@ -111,7 +114,7 @@ var TreeArray = (function () {
                 }
                 finally {
                     path.indexPath.pop();
-                    path.itemPath.pop();
+                    path.nodePath.pop();
                 }
             });
         };
@@ -121,11 +124,11 @@ var TreeArray = (function () {
          */
         Tree.prototype.filter = function (callback, path) {
             var _this = this;
-            if (path === void 0) { path = { indexPath: [], itemPath: [] }; }
+            if (path === void 0) { path = { indexPath: [], nodePath: [] }; }
             return this.data.filter(function (item, index) {
                 try {
                     path.indexPath.push(index);
-                    path.itemPath.push(item);
+                    path.nodePath.push(item);
                     _this.hasChildren(item) &&
                         (item[_this.options.children] = new Tree(item[_this.options.children], {
                             id: _this.options.id,
@@ -138,7 +141,7 @@ var TreeArray = (function () {
                 }
                 finally {
                     path.indexPath.pop();
-                    path.itemPath.pop();
+                    path.nodePath.pop();
                 }
             });
         };
@@ -164,6 +167,26 @@ var TreeArray = (function () {
             finally {
                 return result;
             }
+        };
+        /**
+         * Tree flattening
+         */
+        Tree.prototype.flat = function () {
+            var _this = this;
+            var result = [];
+            this.forEach(function (item, _a) {
+                var _b;
+                var nodePath = _a.nodePath;
+                var data = __assign({}, item);
+                delete data[_this.options.children];
+                data.parent = (_b = nodePath[nodePath.length - 2]) !== null && _b !== void 0 ? _b : null;
+                data.parent && delete data.parent[_this.options.children];
+                data.path = nodePath.map(function (item) { return item[_this.options.id]; });
+                data.level = nodePath.length;
+                data.hasChild = _this.hasChildren(item);
+                result.push(data);
+            });
+            return result;
         };
         /**
          * If there are tree nodes that meet the conditions, it returns true, otherwise it returns false
@@ -210,25 +233,6 @@ var TreeArray = (function () {
             finally {
                 return result;
             }
-        };
-        /**
-         * Tree flattening
-         */
-        Tree.prototype.flat = function () {
-            var _this = this;
-            var result = [];
-            this.forEach(function (item, _a) {
-                var _b;
-                var itemPath = _a.itemPath;
-                var data = __assign({}, item);
-                delete data[_this.options.children];
-                data.parent = (_b = itemPath[itemPath.length - 2]) !== null && _b !== void 0 ? _b : null;
-                data.parent && delete data.parent[_this.options.children];
-                data.path = itemPath.map(function (item) { return item[_this.options.id]; });
-                data.level = itemPath.length;
-                result.push(data);
-            });
-            return result;
         };
         /**
          * Tree data string representation
