@@ -100,7 +100,7 @@ const dataTree = tree(data, {
   // parent node property name of the tree node
   // property value can be parent id or parent node
   // is required
-  parent: 'children'
+  parent: 'parentId'
   
 });
 
