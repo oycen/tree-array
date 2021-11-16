@@ -20,9 +20,9 @@ export interface NodePath<T> {
 class Tree<T extends object> {
   /** Tree default options */
   private static readonly defaultOptions: Required<TreeOptions> = {
-    id: 'id',
-    parent: '',
-    children: 'children',
+    id: "id",
+    parent: "",
+    children: "children",
   };
 
   /** Tree options */
@@ -37,7 +37,7 @@ class Tree<T extends object> {
     const { id, parent, children } = options;
     let result = list.reduce((map: any, item: any) => ((map[item[id]] = item), (item[children] = []), map), {});
     return list.filter((item: any) => {
-      if (Object.prototype.toString.call(item[parent]) === '[object Object]') {
+      if (Object.prototype.toString.call(item[parent]) === "[object Object]") {
         result[item[parent][id]] && result[item[parent][id]].children.push(item);
         return !item[parent][id];
       } else {
@@ -158,10 +158,10 @@ class Tree<T extends object> {
     try {
       this.forEach((item, path, tree) => {
         if (callback.call(this, item, { ...path }, tree)) result = item;
-        if (result) throw new Error('StopIteration');
+        if (result) throw new Error("StopIteration");
       });
-    } catch (error) {
-      if (error.message !== 'StopIteration') throw error;
+    } catch (error: any) {
+      if (error.message !== "StopIteration") throw error;
     } finally {
       return result;
     }
@@ -175,14 +175,11 @@ class Tree<T extends object> {
     this.forEach((item: any, { nodePath }) => {
       const data = { ...item };
 
-      delete data[this.options.children];
-
       data.parent = nodePath[nodePath.length - 2] ?? null;
-      data.parent && delete data.parent[this.options.children];
 
       data.path = nodePath.map((item: any) => item[this.options.id]);
       data.level = nodePath.length;
-      data.hasChild = this.hasChildren(item);
+      data.hasChild = this.hasChildren(data);
 
       result.push(data);
     });
@@ -198,10 +195,10 @@ class Tree<T extends object> {
     try {
       this.forEach((item, path, tree) => {
         if (callback.call(this, item, { ...path }, tree)) result = true;
-        if (result) throw new Error('StopIteration');
+        if (result) throw new Error("StopIteration");
       });
-    } catch (error) {
-      if (error.message !== 'StopIteration') throw error;
+    } catch (error: any) {
+      if (error.message !== "StopIteration") throw error;
     } finally {
       return result;
     }
@@ -216,10 +213,10 @@ class Tree<T extends object> {
     try {
       this.forEach((item, path, tree) => {
         if (!callback.call(this, item, { ...path }, tree)) result = false;
-        if (!result) throw new Error('StopIteration');
+        if (!result) throw new Error("StopIteration");
       });
-    } catch (error) {
-      if (error.message !== 'StopIteration') throw error;
+    } catch (error: any) {
+      if (error.message !== "StopIteration") throw error;
     } finally {
       return result;
     }

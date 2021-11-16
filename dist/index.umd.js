@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TreeArray = factory());
-}(this, (function () { 'use strict';
+})(this, (function () { 'use strict';
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -50,7 +50,7 @@
             var id = options.id, parent = options.parent, children = options.children;
             var result = list.reduce(function (map, item) { return ((map[item[id]] = item), (item[children] = []), map); }, {});
             return list.filter(function (item) {
-                if (Object.prototype.toString.call(item[parent]) === '[object Object]') {
+                if (Object.prototype.toString.call(item[parent]) === "[object Object]") {
                     result[item[parent][id]] && result[item[parent][id]].children.push(item);
                     return !item[parent][id];
                 }
@@ -160,11 +160,11 @@
                     if (callback.call(_this, item, __assign({}, path), tree))
                         result = item;
                     if (result)
-                        throw new Error('StopIteration');
+                        throw new Error("StopIteration");
                 });
             }
             catch (error) {
-                if (error.message !== 'StopIteration')
+                if (error.message !== "StopIteration")
                     throw error;
             }
             finally {
@@ -181,12 +181,10 @@
                 var _b;
                 var nodePath = _a.nodePath;
                 var data = __assign({}, item);
-                delete data[_this.options.children];
                 data.parent = (_b = nodePath[nodePath.length - 2]) !== null && _b !== void 0 ? _b : null;
-                data.parent && delete data.parent[_this.options.children];
                 data.path = nodePath.map(function (item) { return item[_this.options.id]; });
                 data.level = nodePath.length;
-                data.hasChild = _this.hasChildren(item);
+                data.hasChild = _this.hasChildren(data);
                 result.push(data);
             });
             return result;
@@ -203,11 +201,11 @@
                     if (callback.call(_this, item, __assign({}, path), tree))
                         result = true;
                     if (result)
-                        throw new Error('StopIteration');
+                        throw new Error("StopIteration");
                 });
             }
             catch (error) {
-                if (error.message !== 'StopIteration')
+                if (error.message !== "StopIteration")
                     throw error;
             }
             finally {
@@ -226,11 +224,11 @@
                     if (!callback.call(_this, item, __assign({}, path), tree))
                         result = false;
                     if (!result)
-                        throw new Error('StopIteration');
+                        throw new Error("StopIteration");
                 });
             }
             catch (error) {
-                if (error.message !== 'StopIteration')
+                if (error.message !== "StopIteration")
                     throw error;
             }
             finally {
@@ -245,9 +243,9 @@
         };
         /** Tree default options */
         Tree.defaultOptions = {
-            id: 'id',
-            parent: '',
-            children: 'children',
+            id: "id",
+            parent: "",
+            children: "children",
         };
         return Tree;
     }());
@@ -262,4 +260,4 @@
 
     return tree;
 
-})));
+}));
