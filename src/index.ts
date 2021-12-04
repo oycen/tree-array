@@ -29,7 +29,7 @@ class Tree<T extends object> {
   }
 
   forEach(
-    callback: (node: T, path: NodePath<T>, tree: T[]) => void | "continue" | "break",
+    callback: (node: T, path: NodePath<T>, tree: T[]) => void | boolean,
     _path: NodePath<T> = { indexPath: [], nodePath: [] }
   ) {
     for (let index = 0; index < this.data.length; index++) {
@@ -40,11 +40,11 @@ class Tree<T extends object> {
         _path.nodePath.push(item);
 
         const flag = callback.call(null, item, { ..._path }, this.data);
-        if (flag === "continue") break;
-        if (flag === "break") break;
+        if (flag === false) break;
 
-        if (!this.hasChildren(item)) return;
-        new Tree<T>(item[this.options.children], this.options).forEach(callback, _path);
+        if (this.hasChildren(item)) {
+          new Tree<T>(item[this.options.children], this.options).forEach(callback, _path);
+        }
       } catch (error: any) {
         throw error;
       } finally {
@@ -62,7 +62,7 @@ class Tree<T extends object> {
         _path.indexPath.push(index);
         _path.nodePath.push(item);
 
-        if (!this.hasChildren(item)) return;
+        if (!this.hasChildren(item)) return callback.call(null, item, { ..._path }, data);
 
         item[this.options.children] = new Tree<T>(item[this.options.children], this.options).map(callback, _path);
         return callback.call(null, item, { ..._path }, data);
@@ -79,14 +79,14 @@ class Tree<T extends object> {
     callback: (node: T, path: NodePath<T>, tree: T[]) => unknown,
     _path: NodePath<T> = { indexPath: [], nodePath: [] }
   ) {
-    const data = clonedeep(this.data)
+    const data = clonedeep(this.data);
 
     return data.filter((item: any, index) => {
       try {
         _path.indexPath.push(index);
         _path.nodePath.push(item);
 
-        if (!this.hasChildren(item)) return;
+        if (!this.hasChildren(item)) return callback.call(null, item, { ..._path }, data);
 
         item[this.options.children] = new Tree<T>(item[this.options.children], this.options).filter(callback, _path);
         return callback.call(null, item, { ..._path }, data);

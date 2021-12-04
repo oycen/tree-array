@@ -42,13 +42,11 @@ var Tree = /** @class */ (function () {
                 _path.indexPath.push(index);
                 _path.nodePath.push(item);
                 var flag = callback.call(null, item, __assign({}, _path), this.data);
-                if (flag === "continue")
+                if (flag === false)
                     break;
-                if (flag === "break")
-                    break;
-                if (!this.hasChildren(item))
-                    return;
-                new Tree(item[this.options.children], this.options).forEach(callback, _path);
+                if (this.hasChildren(item)) {
+                    new Tree(item[this.options.children], this.options).forEach(callback, _path);
+                }
             }
             catch (error) {
                 throw error;
@@ -68,7 +66,7 @@ var Tree = /** @class */ (function () {
                 _path.indexPath.push(index);
                 _path.nodePath.push(item);
                 if (!_this.hasChildren(item))
-                    return;
+                    return callback.call(null, item, __assign({}, _path), data);
                 item[_this.options.children] = new Tree(item[_this.options.children], _this.options).map(callback, _path);
                 return callback.call(null, item, __assign({}, _path), data);
             }
@@ -90,7 +88,7 @@ var Tree = /** @class */ (function () {
                 _path.indexPath.push(index);
                 _path.nodePath.push(item);
                 if (!_this.hasChildren(item))
-                    return;
+                    return callback.call(null, item, __assign({}, _path), data);
                 item[_this.options.children] = new Tree(item[_this.options.children], _this.options).filter(callback, _path);
                 return callback.call(null, item, __assign({}, _path), data);
             }
