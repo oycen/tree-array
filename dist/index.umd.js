@@ -1,8 +1,12 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TreeArray = factory());
-})(this, (function () { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash.clonedeep')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'lodash.clonedeep'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.TreeArray = {}, global.clonedeep));
+})(this, (function (exports, clonedeep) { 'use strict';
+
+    function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+    var clonedeep__default = /*#__PURE__*/_interopDefaultLegacy(clonedeep);
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -30,234 +34,95 @@
         return __assign.apply(this, arguments);
     };
 
-    /** Tree Class */
     var Tree = /** @class */ (function () {
-        /**
-         * Tree class constructor
-         * @param data Tree structure data or flat tree structure data
-         * @param options Tree options
-         */
         function Tree(data, options) {
-            this.options = __assign(__assign({}, Tree.defaultOptions), options);
-            this.data = (options === null || options === void 0 ? void 0 : options.parent) ? Tree.toTreeData(data, this.options) : data;
+            this.options = Object.assign({}, Tree.defaultTreeOptions, options);
+            this.data = data;
         }
-        /**
-         * Flat array conversion tree array
-         * @param list Flat array
-         * @param options Tree options
-         */
-        Tree.toTreeData = function (list, options) {
-            var id = options.id, parent = options.parent, children = options.children;
-            var result = list.reduce(function (map, item) { return ((map[item[id]] = item), (item[children] = []), map); }, {});
-            return list.filter(function (item) {
-                if (Object.prototype.toString.call(item[parent]) === "[object Object]") {
-                    result[item[parent][id]] && result[item[parent][id]].children.push(item);
-                    return !item[parent][id];
-                }
-                else {
-                    result[item[parent]] && result[item[parent]].children.push(item);
-                    return !item[parent];
-                }
-            });
-        };
-        /**
-         * Determine node has children
-         * @param node Node object
-         */
         Tree.prototype.hasChildren = function (node) {
             return Array.isArray(node[this.options.children]) && node[this.options.children].length > 0;
         };
-        /**
-         * Tree node traversal
-         * @param callback Tree node callback function
-         */
-        Tree.prototype.forEach = function (callback, path) {
-            var _this = this;
-            if (path === void 0) { path = { indexPath: [], nodePath: [] }; }
-            this.data.forEach(function (item, index) {
+        Tree.prototype.forEach = function (callback, _path) {
+            if (_path === void 0) { _path = { indexPath: [], nodePath: [] }; }
+            for (var index = 0; index < this.data.length; index++) {
                 try {
-                    path.indexPath.push(index);
-                    path.nodePath.push(item);
-                    callback.call(_this, item, __assign({}, path), _this.data);
-                    _this.hasChildren(item) &&
-                        new Tree(item[_this.options.children], {
-                            id: _this.options.id,
-                            children: _this.options.children,
-                        }).forEach(callback, path);
+                    var item = this.data[index];
+                    _path.indexPath.push(index);
+                    _path.nodePath.push(item);
+                    var flag = callback.call(null, item, __assign({}, _path), this.data);
+                    if (flag === "continue")
+                        break;
+                    if (flag === "break")
+                        break;
+                    if (!this.hasChildren(item))
+                        return;
+                    new Tree(item[this.options.children], this.options).forEach(callback, _path);
                 }
                 catch (error) {
                     throw error;
                 }
                 finally {
-                    path.indexPath.pop();
-                    path.nodePath.pop();
+                    _path.indexPath.pop();
+                    _path.nodePath.pop();
                 }
-            });
+            }
         };
-        /**
-         * Tree node mapping
-         * @param callback Tree node callback function
-         */
-        Tree.prototype.map = function (callback, path) {
+        Tree.prototype.map = function (callback, _path) {
             var _this = this;
-            if (path === void 0) { path = { indexPath: [], nodePath: [] }; }
-            return this.data.map(function (item, index) {
+            if (_path === void 0) { _path = { indexPath: [], nodePath: [] }; }
+            var data = clonedeep__default["default"](this.data);
+            return data.map(function (item, index) {
                 try {
-                    path.indexPath.push(index);
-                    path.nodePath.push(item);
-                    _this.hasChildren(item) &&
-                        (item[_this.options.children] = new Tree(item[_this.options.children], {
-                            id: _this.options.id,
-                            children: _this.options.children,
-                        }).map(callback, path));
-                    return callback.call(_this, item, __assign({}, path), _this.data);
+                    _path.indexPath.push(index);
+                    _path.nodePath.push(item);
+                    if (!_this.hasChildren(item))
+                        return;
+                    item[_this.options.children] = new Tree(item[_this.options.children], _this.options).map(callback, _path);
+                    return callback.call(null, item, __assign({}, _path), data);
                 }
                 catch (error) {
                     throw error;
                 }
                 finally {
-                    path.indexPath.pop();
-                    path.nodePath.pop();
+                    _path.indexPath.pop();
+                    _path.nodePath.pop();
                 }
             });
         };
-        /**
-         * Tree node filter
-         * @param callback Tree node callback function
-         */
-        Tree.prototype.filter = function (callback, path) {
+        Tree.prototype.filter = function (callback, _path) {
             var _this = this;
-            if (path === void 0) { path = { indexPath: [], nodePath: [] }; }
-            return this.data.filter(function (item, index) {
+            if (_path === void 0) { _path = { indexPath: [], nodePath: [] }; }
+            var data = clonedeep__default["default"](this.data);
+            return data.filter(function (item, index) {
                 try {
-                    path.indexPath.push(index);
-                    path.nodePath.push(item);
-                    _this.hasChildren(item) &&
-                        (item[_this.options.children] = new Tree(item[_this.options.children], {
-                            id: _this.options.id,
-                            children: _this.options.children,
-                        }).filter(callback, path));
-                    return callback.call(_this, item, __assign({}, path), _this.data);
+                    _path.indexPath.push(index);
+                    _path.nodePath.push(item);
+                    if (!_this.hasChildren(item))
+                        return;
+                    item[_this.options.children] = new Tree(item[_this.options.children], _this.options).filter(callback, _path);
+                    return callback.call(null, item, __assign({}, _path), data);
                 }
                 catch (error) {
                     throw error;
                 }
                 finally {
-                    path.indexPath.pop();
-                    path.nodePath.pop();
+                    _path.indexPath.pop();
+                    _path.nodePath.pop();
                 }
             });
         };
-        /**
-         * Find tree node
-         * @param callback Tree node callback function
-         */
-        Tree.prototype.find = function (callback) {
-            var _this = this;
-            var result;
-            try {
-                this.forEach(function (item, path, tree) {
-                    if (callback.call(_this, item, __assign({}, path), tree))
-                        result = item;
-                    if (result)
-                        throw new Error("StopIteration");
-                });
-            }
-            catch (error) {
-                if (error.message !== "StopIteration")
-                    throw error;
-            }
-            finally {
-                return result;
-            }
-        };
-        /**
-         * Tree flattening
-         */
-        Tree.prototype.flat = function () {
-            var _this = this;
-            var result = [];
-            this.forEach(function (item, _a) {
-                var _b;
-                var nodePath = _a.nodePath;
-                var data = __assign({}, item);
-                data.parent = (_b = nodePath[nodePath.length - 2]) !== null && _b !== void 0 ? _b : null;
-                data.path = nodePath.map(function (item) { return item[_this.options.id]; });
-                data.level = nodePath.length;
-                data.hasChild = _this.hasChildren(data);
-                result.push(data);
-            });
-            return result;
-        };
-        /**
-         * If there are tree nodes that meet the conditions, it returns true, otherwise it returns false
-         * @param callback Tree node callback function
-         */
-        Tree.prototype.some = function (callback) {
-            var _this = this;
-            var result = false;
-            try {
-                this.forEach(function (item, path, tree) {
-                    if (callback.call(_this, item, __assign({}, path), tree))
-                        result = true;
-                    if (result)
-                        throw new Error("StopIteration");
-                });
-            }
-            catch (error) {
-                if (error.message !== "StopIteration")
-                    throw error;
-            }
-            finally {
-                return result;
-            }
-        };
-        /**
-         * If all tree nodes meet the conditions, it returns true, otherwise it returns false
-         * @param callback Tree node callback function
-         */
-        Tree.prototype.every = function (callback) {
-            var _this = this;
-            var result = true;
-            try {
-                this.forEach(function (item, path, tree) {
-                    if (!callback.call(_this, item, __assign({}, path), tree))
-                        result = false;
-                    if (!result)
-                        throw new Error("StopIteration");
-                });
-            }
-            catch (error) {
-                if (error.message !== "StopIteration")
-                    throw error;
-            }
-            finally {
-                return result;
-            }
-        };
-        /**
-         * Tree data string representation
-         */
-        Tree.prototype.toString = function () {
-            return JSON.stringify(this.data);
-        };
-        /** Tree default options */
-        Tree.defaultOptions = {
+        Tree.defaultTreeOptions = {
             id: "id",
-            parent: "",
             children: "children",
         };
         return Tree;
     }());
-    /**
-     * Return a tree instance
-     * @param data Tree structure data or flat tree structure data
-     * @param options Tree options
-     */
     function tree(data, options) {
         return new Tree(data, options);
     }
 
-    return tree;
+    exports.tree = tree;
+
+    Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
