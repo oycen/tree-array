@@ -1,4 +1,4 @@
-var TreeArray = (function (exports, clonedeep) {
+var TreeArray = (function (clonedeep) {
     'use strict';
 
     function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -118,10 +118,6 @@ var TreeArray = (function (exports, clonedeep) {
         return new Tree(data, options);
     }
 
-    exports.tree = tree;
+    return tree;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-    return exports;
-
-})({}, clonedeep);
+})(clonedeep);

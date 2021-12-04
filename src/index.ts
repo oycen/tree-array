@@ -100,6 +100,6 @@ class Tree<T extends object> {
   }
 }
 
-export function tree<T extends object>(data: T[], options?: TreeOptions) {
+export default function tree<T extends object>(data: T[], options?: TreeOptions) {
   return new Tree(data, options);
 }

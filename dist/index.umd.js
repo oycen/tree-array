@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash.clonedeep')) :
-    typeof define === 'function' && define.amd ? define(['exports', 'lodash.clonedeep'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.TreeArray = {}, global.clonedeep));
-})(this, (function (exports, clonedeep) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('lodash.clonedeep')) :
+    typeof define === 'function' && define.amd ? define(['lodash.clonedeep'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TreeArray = factory(global.clonedeep));
+})(this, (function (clonedeep) { 'use strict';
 
     function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -121,8 +121,6 @@
         return new Tree(data, options);
     }
 
-    exports.tree = tree;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
+    return tree;
 
 }));

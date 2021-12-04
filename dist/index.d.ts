@@ -16,5 +16,5 @@ declare class Tree<T extends object> {
     map<U>(callback: (node: T, path: NodePath<T>, tree: T[]) => U, _path?: NodePath<T>): (U | undefined)[];
     filter(callback: (node: T, path: NodePath<T>, tree: T[]) => unknown, _path?: NodePath<T>): T[];
 }
-export declare function tree<T extends object>(data: T[], options?: TreeOptions): Tree<T>;
+export default function tree<T extends object>(data: T[], options?: TreeOptions): Tree<T>;
 export {};

@@ -121,4 +121,4 @@ function tree(data, options) {
     return new Tree(data, options);
 }
 
-exports.tree = tree;
+exports["default"] = tree;
