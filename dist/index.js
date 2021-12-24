@@ -75,7 +75,7 @@ var Tree = /** @class */ (function () {
                 _path.nodePath.push(item);
                 if (!_this.hasChildren(item))
                     return callback.call(null, item, __assign({}, _path), data);
-                item[_this.options.children] = new Tree(item[_this.options.children], _this.options).map(callback, _path);
+                item[_this.options.children] = new Tree(clonedeep__default["default"](item[_this.options.children]), _this.options).map(callback, _path);
                 return callback.call(null, item, __assign({}, _path), data);
             }
             catch (error) {
@@ -97,7 +97,7 @@ var Tree = /** @class */ (function () {
                 _path.nodePath.push(item);
                 if (!_this.hasChildren(item))
                     return callback.call(null, item, __assign({}, _path), data);
-                item[_this.options.children] = new Tree(item[_this.options.children], _this.options).filter(callback, _path);
+                item[_this.options.children] = new Tree(clonedeep__default["default"](item[_this.options.children]), _this.options).filter(callback, _path);
                 return callback.call(null, item, __assign({}, _path), data);
             }
             catch (error) {

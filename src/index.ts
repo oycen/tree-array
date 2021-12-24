@@ -64,7 +64,7 @@ class Tree<T extends object> {
 
         if (!this.hasChildren(item)) return callback.call(null, item, { ..._path }, data);
 
-        item[this.options.children] = new Tree<T>(item[this.options.children], this.options).map(callback, _path);
+        item[this.options.children] = new Tree<T>(clonedeep(item[this.options.children]), this.options).map(callback, _path);
         return callback.call(null, item, { ..._path }, data);
       } catch (error) {
         throw error;
@@ -88,7 +88,7 @@ class Tree<T extends object> {
 
         if (!this.hasChildren(item)) return callback.call(null, item, { ..._path }, data);
 
-        item[this.options.children] = new Tree<T>(item[this.options.children], this.options).filter(callback, _path);
+        item[this.options.children] = new Tree<T>(clonedeep(item[this.options.children]), this.options).filter(callback, _path);
         return callback.call(null, item, { ..._path }, data);
       } catch (error) {
         throw error;
